@@ -11,8 +11,8 @@ public class simGridDisplay extends JPanel {
 	private static SimGrid simGrid;
 	public static void main(String[] args){
 		
-		simGrid = new SimGrid(10,10);
-		simGrid.zero();
+		simGrid = new SimGrid(5,5);
+		simGrid.ones();
 		
 		JFrame frame = new JFrame("Fluid Sim");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
