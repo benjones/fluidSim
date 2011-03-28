@@ -26,23 +26,34 @@ public class SimGrid implements Serializable {
 	//across the bottom row,
 	//then across the second row from the bottom, left to right, etc
 	private double[] pressure;
-	private double[] u;
-	private double[] v;
+	private double[] u, uTemp;
+	private double[] v, vTemp;
+	private double[] T, TTemp;//temperature and advected temp
+	//also stored at cell centers
 	private int width, height;
+	double dx;//grid spacing
 	private final double arrowScale = .01;
+	
+	private enum gridTypes {TEMP, PRESSURE};
+	
 
-	public SimGrid(int width, int height) {
+	public SimGrid(int width, int height, double dx) {
 		this.width = width;
 		this.height = height;
+		this.dx = dx;
 		pressure = new double[width * height];
 		u = new double[(width + 1) * height];
+		uTemp = new double[(width +1)*height];
 		v = new double[width * (height + 1)];
-
+		vTemp = new double[width*(height +1)];
+		T = new double[width*height];
+		TTemp = new double[width*height];
+		
 	}
 
 	public void zero() {
 		for (int i = 0; i < width * height; ++i) {
-			pressure[i] = 0;
+			pressure[i] = T[i] = TTemp[i]= 0;
 		}
 		for (int i = 0; i < (width + 1) * height; ++i)
 			u[i] = 0;
@@ -52,7 +63,8 @@ public class SimGrid implements Serializable {
 
 	public void ones() {
 		for (int i = 0; i < width * height; ++i) {
-			pressure[i] = 0;
+			pressure[i] = 1;
+			T[i] = i*.1; 
 		}
 		for (int i = 0; i < (width + 1) * height; ++i)
 			u[i] = 1;
@@ -187,4 +199,47 @@ public class SimGrid implements Serializable {
 		} else
 			return false;
 	}
+	public void advect(double dt){
+		//semi lagrangian advection
+		//q_grid^n+1 = interpolate(q^n, x_p) wher x_p is where the 'particle' advected to the
+		//grid point started at the beginning of the timestep
+		Point2D.Double xP = new Point2D.Double();
+		Point2D.Double xMid = new Point2D.Double();
+		for(int i = 0; i < width*height; ++i){
+			
+		}
+	
+	}
+	private double intepolateGridCenter(Point2D.Double pos, gridTypes gridType){
+		
+		
+		int xGrid = Math.max((int) Math.floor(pos.x/dx),0);
+		int yGrid = Math.max((int) Math.floor(pos.y/dx),0);
+		int xPGrid = Math.min(xGrid +1, width -1);
+		int yPGrid = Math.min(yGrid +1, height -1);
+		
+		double xDiff = pos.x - xGrid*dx;
+		double yDiff = pos.y - yGrid*dx;
+		
+		double [] arr;
+		switch(gridType){
+		case TEMP:
+			arr = T;
+			break;
+		case PRESSURE:
+			arr = pressure;
+			break;
+		default:
+			arr = null;
+		}
+		double fq11, fq21, fq12, fq22;
+		fq11 = arr[xGrid + yGrid*width];
+		fq12 = arr[xGrid + yPGrid*width];
+		fq21 = arr[xPGrid + yGrid*width];
+		fq22 = arr[xPGrid + yPGrid*width];
+		
+		return MathUtils.bilinearInterpolate(fq11, fq12, fq21, fq22, dx, xDiff, yDiff);
+		
+	}
+	
 }
