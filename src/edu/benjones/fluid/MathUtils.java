@@ -1,5 +1,7 @@
 package edu.benjones.fluid;
 
+import java.awt.Color;
+
 public class MathUtils {
 
 	public static boolean doubleEquals(double n1, double n2, double tol) {
@@ -18,5 +20,26 @@ public class MathUtils {
 				* (dx - yDiff) + fq12 * (dx - xDiff) * (yDiff) + fq22 * (xDiff)
 				* (yDiff))
 				* denom;
+	}
+
+	public static Color blendColors(Color c1, Color c2, float alpha) {
+		return new Color(
+				(int) (c1.getRed() * (1 - alpha) + c2.getRed() * alpha),
+				(int) (c1.getGreen() * (1 - alpha) + c2.getGreen() * alpha),
+				(int) (c1.getBlue() * (1 - alpha) + c2.getBlue() * alpha));
+	}
+
+	/**
+	 * scales val to range [0,1], 0 means <= low, 1 means >= high linearly
+	 * scaled in between
+	 * 
+	 * @param low
+	 * @param high
+	 * @param val
+	 * @return
+	 */
+	public static float scaleRange(float low, float high, float val) {
+		assert (low != high);
+		return Math.max(0f, Math.min(1.0f, (val - low) / ((high - low))));
 	}
 }
