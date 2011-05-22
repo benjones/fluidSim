@@ -74,7 +74,7 @@ public class SimGrid implements Serializable {
 	public void ones() {
 		for (int i = 0; i < width * height; ++i) {
 			pressure[i] = 1;
-			T[i] = i * .1;
+			T[i] = i * .2;
 		}
 		for (int i = 0; i < (width + 1) * height; ++i)
 			u[i] = 1;
@@ -244,6 +244,10 @@ public class SimGrid implements Serializable {
 			return false;
 	}
 
+	public void advance(double dt) {
+		advect(dt);
+	}
+
 	public void advect(double dt) {
 		// semi lagrangian advection
 		// q_grid^n+1 = interpolate(q^n, x_p) wher x_p is where the 'particle'
@@ -254,18 +258,29 @@ public class SimGrid implements Serializable {
 		for (int i = 0; i < width * height; ++i) {
 
 		}
+		System.out.println("advecting");
 
 	}
 
 	private double intepolateGridCenter(Point2D.Double pos, gridTypes gridType) {
 
-		int xGrid = Math.max((int) Math.floor(pos.x / dx), 0);
-		int yGrid = Math.max((int) Math.floor(pos.y / dx), 0);
-		int xPGrid = Math.min(xGrid + 1, width - 1);
-		int yPGrid = Math.min(yGrid + 1, height - 1);
+		// cells are clamped, so if they're totally outside the grid,
+		// they'll intepolate to teh closest value on the edge
 
-		double xDiff = pos.x - xGrid * dx;
-		double yDiff = pos.y - yGrid * dx;
+		// cell centers are actually .5dx, .5dx offset
+		Point2D.Double adjusted = new Point2D.Double(pos.x + .5 * dx, pos.y
+				+ .5 * dx);
+		// left/below grid cells, clamped
+		int xGridOriginal = (int) Math.floor(adjusted.x / dx);
+		int yGridOriginal = (int) Math.floor(adjusted.y / dx);
+		int xGrid = Math.min(Math.max(xGridOriginal, 0), width - 1);
+		int yGrid = Math.min(Math.max(yGridOriginal, 0), height - 1);
+		// right/above grid cells, clamped
+		int xPGrid = Math.min(Math.max(xGridOriginal + 1, 0), width - 1);
+		int yPGrid = Math.min(Math.max(yGridOriginal + 1, 0), height - 1);
+
+		double xDiff = pos.x - (xGrid + .5) * dx;
+		double yDiff = pos.y - (yGrid + .5) * dx;
 
 		double[] arr;
 		switch (gridType) {
@@ -287,6 +302,23 @@ public class SimGrid implements Serializable {
 		return MathUtils.bilinearInterpolate(fq11, fq12, fq21, fq22, dx, xDiff,
 				yDiff);
 
+	}
+
+	private Point2D.Double intepolateVelocity(Point2D.Double pos) {
+		int xGridOriginal = (int) Math.floor(pos.x / dx);
+		int yGridOriginal = (int) Math.floor(pos.y / dx);
+
+		int xGrid = Math.max(Math.min(xGridOriginal, width), 0);
+		int yGrid = Math.max(Math.min(yGridOriginal, height), 0);
+
+		int xPGrid = Math.max(Math.min(xGridOriginal + 1, width), 0);
+		int yPGrid = Math.max(Math.min(yGridOriginal + 1, height), 0);
+		return new Point2D.Double(MathUtils.linearInterpolate(u[xGrid],
+				u[xPGrid], dx, pos.x - xGrid * dx),
+				MathUtils.linearInterpolate(v[yGrid], v[yPGrid], dx, pos.y
+						- yGrid * dx)
+
+		);
 	}
 
 	public Color getLowBlend() {

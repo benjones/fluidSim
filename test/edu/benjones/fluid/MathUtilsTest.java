@@ -42,8 +42,26 @@ public class MathUtilsTest {
 	}
 
 	@Test
+	public void testLinearInterp() {
+		assertEquals(MathUtils.doubleEquals(
+				MathUtils.linearInterpolate(1, 2, 1, 0), 1), true);
+		assertEquals(MathUtils.doubleEquals(
+				MathUtils.linearInterpolate(1, 2, 1, .5), 1.5), true);
+		assertEquals(MathUtils.doubleEquals(
+				MathUtils.linearInterpolate(1, 2, 1, 1), 2), true);
+		assertEquals(MathUtils.doubleEquals(
+				MathUtils.linearInterpolate(1, 2, .5, 0), 1), true);
+		assertEquals(MathUtils.doubleEquals(
+				MathUtils.linearInterpolate(1, 2, .5, .5), 2), true);
+		assertEquals(MathUtils.doubleEquals(
+				MathUtils.linearInterpolate(1, 2, 4, 0), 1), true);
+		assertEquals(MathUtils.doubleEquals(
+				MathUtils.linearInterpolate(1, 2, 4, 1), 1.25), true);
+	}
+
+	@Test
 	public void testBlendColors() {
-		
+
 		assertEquals(
 				MathUtils.blendColors(Color.RED, Color.BLUE, 0).equals(
 						Color.RED), true);
@@ -51,18 +69,19 @@ public class MathUtilsTest {
 				MathUtils.blendColors(Color.RED, Color.BLUE, 1).equals(
 						Color.BLUE), true);
 		assertEquals(MathUtils.blendColors(Color.RED, Color.BLUE, .5f),
-					MathUtils.blendColors(Color.BLUE, Color.RED, .5f));
+				MathUtils.blendColors(Color.BLUE, Color.RED, .5f));
 
 	}
+
 	@Test
 	public void testScaleRange() {
-		assertTrue(MathUtils.doubleEquals(MathUtils.scaleRange(0,1,0),0f));
-		assertTrue(MathUtils.doubleEquals(MathUtils.scaleRange(0,1,1),1f));
-		assertTrue(MathUtils.doubleEquals(MathUtils.scaleRange(0,1,2),1f));
-		assertTrue(MathUtils.doubleEquals(MathUtils.scaleRange(0,1,-1),0f));
-		assertTrue(MathUtils.doubleEquals(MathUtils.scaleRange(0,2,0),0f));
-		assertTrue(MathUtils.doubleEquals(MathUtils.scaleRange(0,2,1),0.5f));
-		assertTrue(MathUtils.doubleEquals(MathUtils.scaleRange(0,2,2),1f));
-		
+		assertTrue(MathUtils.doubleEquals(MathUtils.scaleRange(0, 1, 0), 0f));
+		assertTrue(MathUtils.doubleEquals(MathUtils.scaleRange(0, 1, 1), 1f));
+		assertTrue(MathUtils.doubleEquals(MathUtils.scaleRange(0, 1, 2), 1f));
+		assertTrue(MathUtils.doubleEquals(MathUtils.scaleRange(0, 1, -1), 0f));
+		assertTrue(MathUtils.doubleEquals(MathUtils.scaleRange(0, 2, 0), 0f));
+		assertTrue(MathUtils.doubleEquals(MathUtils.scaleRange(0, 2, 1), 0.5f));
+		assertTrue(MathUtils.doubleEquals(MathUtils.scaleRange(0, 2, 2), 1f));
+
 	}
 }

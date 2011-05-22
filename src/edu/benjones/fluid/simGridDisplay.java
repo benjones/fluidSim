@@ -13,12 +13,30 @@ public class simGridDisplay extends JPanel {
 		
 		simGrid = new SimGrid(5,5, .1);
 		simGrid.ones();
+		final double dt = .05;
 		
-		JFrame frame = new JFrame("Fluid Sim");
+		final JFrame frame = new JFrame("Fluid Sim");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.add(new simGridDisplay());
 		frame.setSize(800, 800);
 		frame.setVisible(true);
+		
+		frame.addKeyListener(new KeyListener(){
+			public void keyTyped(KeyEvent event){
+				simGrid.advance(dt);
+				frame.repaint();
+			}
+
+			public void keyPressed(KeyEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			public void keyReleased(KeyEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
 	}
 	public void paintComponent(Graphics g) {
 		g.setColor(Color.WHITE);
