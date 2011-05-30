@@ -38,7 +38,7 @@ public class SimGrid implements Serializable {
 
 	private double yStep;
 
-	private enum gridTypes {
+	public enum gridTypes {
 		TEMP, PRESSURE
 	};
 
@@ -74,7 +74,7 @@ public class SimGrid implements Serializable {
 	public void ones() {
 		for (int i = 0; i < width * height; ++i) {
 			pressure[i] = 1;
-			T[i] = i * .2;
+			T[i] = ((int) (i / width)) * .2;
 		}
 		for (int i = 0; i < (width + 1) * height; ++i)
 			u[i] = 1;
@@ -262,7 +262,7 @@ public class SimGrid implements Serializable {
 
 	}
 
-	private double intepolateGridCenter(Point2D.Double pos, gridTypes gridType) {
+	public double intepolateGridCenter(Point2D.Double pos, gridTypes gridType) {
 
 		// cells are clamped, so if they're totally outside the grid,
 		// they'll intepolate to teh closest value on the edge
@@ -270,6 +270,8 @@ public class SimGrid implements Serializable {
 		// cell centers are actually .5dx, .5dx offset
 		Point2D.Double adjusted = new Point2D.Double(pos.x + .5 * dx, pos.y
 				+ .5 * dx);
+
+		System.out.println("Adjusted: " + adjusted.x + " " + adjusted.y);
 		// left/below grid cells, clamped
 		int xGridOriginal = (int) Math.floor(adjusted.x / dx);
 		int yGridOriginal = (int) Math.floor(adjusted.y / dx);
@@ -281,6 +283,12 @@ public class SimGrid implements Serializable {
 
 		double xDiff = pos.x - (xGrid + .5) * dx;
 		double yDiff = pos.y - (yGrid + .5) * dx;
+
+		System.out.println("xGrid original: " + xGridOriginal
+				+ " yGridOriginal " + yGridOriginal);
+
+		System.out.println("xGrid " + xGrid + " xPGrid " + xPGrid + " yGrid "
+				+ yGrid + " yPGrid " + yPGrid);
 
 		double[] arr;
 		switch (gridType) {
@@ -299,12 +307,14 @@ public class SimGrid implements Serializable {
 		fq21 = arr[xPGrid + yGrid * width];
 		fq22 = arr[xPGrid + yPGrid * width];
 
-		return MathUtils.bilinearInterpolate(fq11, fq12, fq21, fq22, dx, xDiff,
-				yDiff);
+		double res = MathUtils.bilinearInterpolate(fq11, fq12, fq21, fq22, dx,
+				xDiff, yDiff);
+		System.out.println("interp: " + res);
+		return res;
 
 	}
 
-	private Point2D.Double intepolateVelocity(Point2D.Double pos) {
+	public Point2D.Double intepolateVelocity(Point2D.Double pos) {
 		int xGridOriginal = (int) Math.floor(pos.x / dx);
 		int yGridOriginal = (int) Math.floor(pos.y / dx);
 
@@ -335,6 +345,36 @@ public class SimGrid implements Serializable {
 
 	public void setHighBlend(Color highBlend) {
 		this.highBlend = highBlend;
+	}
+
+	public int getWidth() {
+		return width;
+	}
+
+	public int getHeight() {
+		return height;
+	}
+
+	public double getDx() {
+		return dx;
+	}
+
+	public double getCellCenter(int row, int col, gridTypes gridType) {
+
+		double[] arr;
+		switch (gridType) {
+		case TEMP:
+			arr = T;
+			break;
+		case PRESSURE:
+			arr = pressure;
+			break;
+		default:
+			arr = null;
+		}
+		double res = arr[row * width + col];
+		System.out.println("cell center: " + res);
+		return res;
 	}
 
 }
