@@ -32,12 +32,12 @@ public class SimGridTest {
 
 	@Test
 	public void testIntepolateCenter() {
-		SimGrid testGrid = new SimGrid(2, 5, .1);
+		SimGrid testGrid = new SimGrid(4, 8, .1);
 		testGrid.ones();
 		double dx = testGrid.getDx();
 		for (int i = 0; i < testGrid.getHeight(); ++i) {
 			for (int j = 0; j < testGrid.getWidth(); ++j) {
-				System.out.println("row: " + i + " col: " + j);
+				//System.out.println("row: " + i + " col: " + j);
 				assertEquals(MathUtils.doubleEquals(testGrid.getCellCenter(i,
 						j, gridTypes.TEMP), testGrid.intepolateGridCenter(
 						new Point2D.Double((j + .5) * dx, (i + .5) * dx),

@@ -264,32 +264,30 @@ public class SimGrid implements Serializable {
 
 	public double intepolateGridCenter(Point2D.Double pos, gridTypes gridType) {
 
-		// cells are clamped, so if they're totally outside the grid,
-		// they'll intepolate to teh closest value on the edge
-
-		// cell centers are actually .5dx, .5dx offset
-		Point2D.Double adjusted = new Point2D.Double(pos.x + .5 * dx, pos.y
-				+ .5 * dx);
-
-		System.out.println("Adjusted: " + adjusted.x + " " + adjusted.y);
-		// left/below grid cells, clamped
-		int xGridOriginal = (int) Math.floor(adjusted.x / dx);
-		int yGridOriginal = (int) Math.floor(adjusted.y / dx);
-		int xGrid = Math.min(Math.max(xGridOriginal, 0), width - 1);
-		int yGrid = Math.min(Math.max(yGridOriginal, 0), height - 1);
-		// right/above grid cells, clamped
-		int xPGrid = Math.min(Math.max(xGridOriginal + 1, 0), width - 1);
-		int yPGrid = Math.min(Math.max(yGridOriginal + 1, 0), height - 1);
-
-		double xDiff = pos.x - (xGrid + .5) * dx;
-		double yDiff = pos.y - (yGrid + .5) * dx;
-
-		System.out.println("xGrid original: " + xGridOriginal
-				+ " yGridOriginal " + yGridOriginal);
-
-		System.out.println("xGrid " + xGrid + " xPGrid " + xPGrid + " yGrid "
-				+ yGrid + " yPGrid " + yPGrid);
-
+		int xMod = (int)(pos.x/dx);
+		int yMod = (int)(pos.y/dx);
+		
+		int xGrid, yGrid, xPGrid, yPGrid;
+		double xDiff, yDiff;
+		if(pos.x - xMod*dx < .5){
+			xGrid = Math.max(0, xMod -1);
+			xPGrid = Math.min(width, xMod);
+			
+		}
+		else{
+			xGrid = Math.max(0, xMod);
+			xPGrid = Math.min(width, xMod +1);
+		}
+		xDiff = pos.x - (xGrid + .5)*dx;
+		if(pos.y - yMod*dx < .5){
+			yGrid = Math.max(0, yMod -1);
+			yPGrid = Math.min(height, yMod);
+		} else{
+			yGrid = Math.max(0, yMod);
+			yPGrid = Math.min(height, yMod +1);
+		}
+		yDiff = pos.y - (yGrid + .5)*dx;
+		
 		double[] arr;
 		switch (gridType) {
 		case TEMP:
@@ -307,10 +305,9 @@ public class SimGrid implements Serializable {
 		fq21 = arr[xPGrid + yGrid * width];
 		fq22 = arr[xPGrid + yPGrid * width];
 
-		double res = MathUtils.bilinearInterpolate(fq11, fq12, fq21, fq22, dx,
+		return MathUtils.bilinearInterpolate(fq11, fq12, fq21, fq22, dx,
 				xDiff, yDiff);
-		System.out.println("interp: " + res);
-		return res;
+		
 
 	}
 
@@ -372,9 +369,8 @@ public class SimGrid implements Serializable {
 		default:
 			arr = null;
 		}
-		double res = arr[row * width + col];
-		System.out.println("cell center: " + res);
-		return res;
+		return arr[row * width + col];
+
 	}
 
 }
